@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -33,9 +34,9 @@ public class LoginController {
 
     @PostMapping("do_login")
     @ResponseBody
-    public Result doLogin(@Valid LoginVo loginVo) {
+    public Result doLogin(HttpServletResponse response, @Valid LoginVo loginVo) {
         log.info(miaoshauserService.getById(Long.parseLong("13263138306")).toString());
-        miaoshauserService.login(loginVo);
+        miaoshauserService.login(loginVo, response);
         return Result.success(true);
     }
 
