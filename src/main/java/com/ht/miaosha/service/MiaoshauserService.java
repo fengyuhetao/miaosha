@@ -10,5 +10,5 @@ import com.ht.miaosha.vo.LoginVo;
 public interface MiaoshauserService {
     public MiaoshaUser getById(long id);
 
-    CodeMsg login(LoginVo loginVo);
+    boolean login(LoginVo loginVo);
 }

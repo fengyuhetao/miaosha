@@ -2,6 +2,7 @@ package com.ht.miaosha.service.impl;
 
 import com.ht.miaosha.dao.MiaoshaUserDao;
 import com.ht.miaosha.entity.MiaoshaUser;
+import com.ht.miaosha.exception.GlobalException;
 import com.ht.miaosha.result.CodeMsg;
 import com.ht.miaosha.service.MiaoshauserService;
 import com.ht.miaosha.util.MD5Util;
@@ -24,27 +25,23 @@ public class MiaoshaUserServiceImpl implements MiaoshauserService {
     }
 
     @Override
-    public CodeMsg login(LoginVo loginVo) {
+    public boolean login(LoginVo loginVo) {
         if(loginVo == null) {
-            return CodeMsg.SERVER_ERROR;
+            throw new GlobalException(CodeMsg.SERVER_ERROR);
         }
 
-        String mobile = loginVo.getMobile();
-        String formPass = loginVo.getPassword();
 //        判断手机号是否存在
-        MiaoshaUser user = getById(Long.parseLong(mobile));
+        MiaoshaUser user = getById(Long.parseLong(loginVo.getMobile()));
         if(user == null) {
-            return CodeMsg.MOBILE_NOT_EXIST;
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
         }
 
         //验证密码
-        String dbPass = user.getPassword();
-        String saltDB = user.getSalt();
-        String calcPass = MD5Util.formPassToDBPass(formPass, saltDB);
-        if(!calcPass.equals(dbPass)) {
-            return CodeMsg.PASSWORD_ERROR;
+        String calcPass = MD5Util.formPassToDBPass(loginVo.getPassword(), user.getSalt());
+        if(!calcPass.equals(user.getPassword())) {
+            throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }
 
-        return CodeMsg.SUCCESS;
+        return true;
     }
 }

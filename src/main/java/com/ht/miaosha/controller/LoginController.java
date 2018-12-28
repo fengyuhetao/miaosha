@@ -35,12 +35,8 @@ public class LoginController {
     @ResponseBody
     public Result doLogin(@Valid LoginVo loginVo) {
         log.info(miaoshauserService.getById(Long.parseLong("13263138306")).toString());
-        CodeMsg result = miaoshauserService.login(loginVo);
-        if(result.getCode() == 0) {
-            return Result.success(CodeMsg.SUCCESS);
-        } else {
-            return Result.error(result);
-        }
+        miaoshauserService.login(loginVo);
+        return Result.success(true);
     }
 
 }
