@@ -3,7 +3,6 @@ package com.ht.miaosha.controller;
 import com.ht.miaosha.result.CodeMsg;
 import com.ht.miaosha.result.Result;
 import com.ht.miaosha.service.MiaoshauserService;
-import com.ht.miaosha.util.ValidatorUtil;
 import com.ht.miaosha.vo.LoginVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
+
+import javax.validation.Valid;
 
 /**
  * Created by hetao on 2018/12/27.
@@ -32,7 +33,7 @@ public class LoginController {
 
     @PostMapping("do_login")
     @ResponseBody
-    public Result doLogin(LoginVo loginVo) {
+    public Result doLogin(@Valid LoginVo loginVo) {
         log.info(loginVo.toString());
         // 参数校验
         String passInput = loginVo.getPassword();
@@ -43,10 +44,6 @@ public class LoginController {
 
         if(StringUtils.isEmpty(mobile)) {
             return Result.error(CodeMsg.MOBILE_EMPTY);
-        }
-
-        if(!ValidatorUtil.isMobile(mobile)) {
-            return Result.error(CodeMsg.MOBILE_ERROR);
         }
 
         log.info(miaoshauserService.getById(Long.parseLong("13263138306")).toString());
