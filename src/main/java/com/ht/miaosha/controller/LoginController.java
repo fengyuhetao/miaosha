@@ -34,18 +34,6 @@ public class LoginController {
     @PostMapping("do_login")
     @ResponseBody
     public Result doLogin(@Valid LoginVo loginVo) {
-        log.info(loginVo.toString());
-        // 参数校验
-        String passInput = loginVo.getPassword();
-        String mobile = loginVo.getMobile();
-        if(StringUtils.isEmpty(passInput)) {
-            return Result.error(CodeMsg.PASSWORD_EMPTY);
-        }
-
-        if(StringUtils.isEmpty(mobile)) {
-            return Result.error(CodeMsg.MOBILE_EMPTY);
-        }
-
         log.info(miaoshauserService.getById(Long.parseLong("13263138306")).toString());
         CodeMsg result = miaoshauserService.login(loginVo);
         if(result.getCode() == 0) {
