@@ -6,7 +6,7 @@ import com.ht.miaosha.exception.GlobalException;
 import com.ht.miaosha.redis.MiaoshaUserKey;
 import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.result.CodeMsg;
-import com.ht.miaosha.service.MiaoshauserService;
+import com.ht.miaosha.service.MiaoshaUserService;
 import com.ht.miaosha.util.MD5Util;
 import com.ht.miaosha.util.UUIDUtil;
 import com.ht.miaosha.vo.LoginVo;
@@ -15,16 +15,13 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.CookieHandler;
 
 /**
  * Created by hetao on 2018/12/27.
  */
 @Service
-public class MiaoshaUserServiceImpl implements MiaoshauserService {
-    public static final String COOKIE_NAME_TOKEN = "token";
+public class MiaoshaUserServiceImpl implements MiaoshaUserService {
 
     @Autowired
     MiaoshaUserDao miaoshaUserDao;

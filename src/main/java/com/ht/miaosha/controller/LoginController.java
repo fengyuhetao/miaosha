@@ -1,8 +1,7 @@
 package com.ht.miaosha.controller;
 
-import com.ht.miaosha.result.CodeMsg;
 import com.ht.miaosha.result.Result;
-import com.ht.miaosha.service.MiaoshauserService;
+import com.ht.miaosha.service.MiaoshaUserService;
 import com.ht.miaosha.vo.LoginVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -25,7 +23,7 @@ public class LoginController {
     private static Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
-    public MiaoshauserService miaoshauserService;
+    public MiaoshaUserService miaoshauserService;
 
     @GetMapping("/to_login")
     public String toLogin() {

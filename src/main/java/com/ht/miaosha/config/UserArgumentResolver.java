@@ -1,11 +1,12 @@
 package com.ht.miaosha.config;
 
 import com.ht.miaosha.entity.MiaoshaUser;
-import com.ht.miaosha.service.impl.MiaoshaUserServiceImpl;
+import com.ht.miaosha.service.MiaoshaUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     @Autowired
-    MiaoshaUserServiceImpl userService;
+    MiaoshaUserService userService;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -35,9 +36,10 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter methodParameter, @Nullable ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        String paramToken = request.getParameter(MiaoshaUserServiceImpl.COOKIE_NAME_TOKEN);
-        String cookieToken = getCookieValue(request, MiaoshaUserServiceImpl.COOKIE_NAME_TOKEN);
+        String paramToken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
+        String cookieToken = getCookieValue(request, MiaoshaUserService.COOKIE_NAME_TOKEN);
 
+        //TODO 这里需要注意，现在没有办法直接跳转到登录页面
         if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
             return "login";
         }
@@ -48,6 +50,11 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
         Cookie[] cookies = request.getCookies();
+
+        if(cookies == null || cookies.length == 0) {
+            return null;
+        }
+
         for (Cookie cookie: cookies) {
             if(cookie.getName().equals(cookieNameToken)) {
                 return cookie.getValue();
