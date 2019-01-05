@@ -1,5 +1,6 @@
 package com.ht.miaosha.service;
 
+import com.ht.miaosha.entity.Goods;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.stereotype.Service;
 
@@ -12,4 +13,6 @@ public interface GoodsService {
     List<GoodsVo> getGoodsList();
 
     GoodsVo getGoodsVoByGoodsId(long goodsId);
+
+    void reduceStock(GoodsVo good);
 }

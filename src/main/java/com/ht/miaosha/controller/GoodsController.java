@@ -69,6 +69,4 @@ public class GoodsController {
 
         return "goods_detail";
     }
-
-
 }

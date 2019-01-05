@@ -1,6 +1,8 @@
 package com.ht.miaosha.service.impl;
 
 import com.ht.miaosha.dao.GoodsDao;
+import com.ht.miaosha.entity.Goods;
+import com.ht.miaosha.entity.MiaoshaGoods;
 import com.ht.miaosha.service.GoodsService;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +27,14 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public GoodsVo getGoodsVoByGoodsId(long goodsId) {
         return goodsDao.getGoodsVoByGoodsId(goodsId);
+    }
+
+    @Override
+    public void reduceStock(GoodsVo good) {
+        //        减少库存
+        MiaoshaGoods g = new MiaoshaGoods();
+        g.setGoodsId(good.getId());
+        g.setStockCount(good.getGoodsStock() - 1);
+        goodsDao.reduceStock(g);
     }
 }

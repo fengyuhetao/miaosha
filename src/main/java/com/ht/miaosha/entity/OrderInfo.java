@@ -13,7 +13,7 @@ import java.util.Date;
 public class OrderInfo {
     private Long id;
 
-    private Integer userId;
+    private Long userId;
 
     private Long goodsId;
 
@@ -25,9 +25,9 @@ public class OrderInfo {
 
     private Double goodsPrice;
 
-    private OrderChannel orderChannel;
+    private Integer orderChannel;
 
-    private OrderStatus status;
+    private Integer status;
 
     private Date createDate;
 
