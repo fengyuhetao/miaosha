@@ -9,13 +9,16 @@ import com.ht.miaosha.service.MiaoshaService;
 import com.ht.miaosha.service.OrderService;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created by hetao on 2019/1/5.
  */
+@Controller
 @RequestMapping("/miaosha")
 public class MiaoshaController {
     @Autowired
@@ -27,7 +30,7 @@ public class MiaoshaController {
     @Autowired
     MiaoshaService miaoshaService;
 
-    @RequestMapping("/do_miaosha")
+    @PostMapping("/do_miaosha")
     public String list(Model model, MiaoshaUser user, @RequestParam("goodsId")long goodsId) {
         model.addAttribute("user", user);
 
@@ -36,7 +39,7 @@ public class MiaoshaController {
         int stock = goods.getStockCount();
 
         if(stock <= 0) {
-            model.addAttribute("errmsg", CodeMsg.MIAOSHA_OVER);
+            model.addAttribute("errmsg", CodeMsg.MIAOSHA_OVER.getMsg());
             return "miaosha_fail";
         }
 
@@ -44,7 +47,7 @@ public class MiaoshaController {
         MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
 
         if(miaoshaOrder != null) {
-            model.addAttribute("errmsg", CodeMsg.REPEAT_MIAOSHA);
+            model.addAttribute("errmsg", CodeMsg.REPEAT_MIAOSHA.getMsg());
             return "miaosha_fail";
         }
 

@@ -1,7 +1,6 @@
 package com.ht.miaosha.service.impl;
 
 import com.ht.miaosha.dao.OrderDao;
-import com.ht.miaosha.entity.MiaoshaGoods;
 import com.ht.miaosha.entity.MiaoshaOrder;
 import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.entity.OrderInfo;

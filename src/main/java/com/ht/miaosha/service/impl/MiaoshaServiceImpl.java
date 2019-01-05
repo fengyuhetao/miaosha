@@ -41,6 +41,6 @@ public class MiaoshaServiceImpl implements MiaoshaService {
 
 //        order_info miaosha_order
         OrderInfo orderInfo = orderService.createOrder(user, goodsVo);
-        return null;
+        return orderInfo;
     }
 }
