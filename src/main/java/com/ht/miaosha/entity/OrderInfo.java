@@ -1,7 +1,7 @@
 package com.ht.miaosha.entity;
 
 import com.ht.miaosha.enumerate.OrderChannel;
-import com.ht.miaosha.enumerate.Status;
+import com.ht.miaosha.enumerate.OrderStatus;
 import lombok.Data;
 
 import java.util.Date;
@@ -27,7 +27,7 @@ public class OrderInfo {
 
     private OrderChannel orderChannel;
 
-    private Status status;
+    private OrderStatus status;
 
     private Date createDate;
 

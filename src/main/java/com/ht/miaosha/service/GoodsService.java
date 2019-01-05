@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface GoodsService {
     List<GoodsVo> getGoodsList();
+
+    GoodsVo getGoodsVoByGoodsId(long goodsId);
 }

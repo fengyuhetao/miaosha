@@ -1,11 +1,9 @@
 package com.ht.miaosha.enumerate;
 
-import lombok.Data;
-
 /**
  * Created by hetao on 2019/1/4.
  */
-public enum  Status {
+public enum OrderStatus {
     NEW_WITHOUT_PAY(0, "新建未支付"),
     PAY_COMPLETE(1, "已支付"),
     SEND_GOOD(2, "已发货"),
@@ -17,7 +15,7 @@ public enum  Status {
 
     private String message;
 
-    Status(Integer code, String message) {
+    OrderStatus(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

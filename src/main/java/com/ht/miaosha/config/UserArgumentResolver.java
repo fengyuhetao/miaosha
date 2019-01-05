@@ -1,6 +1,7 @@
 package com.ht.miaosha.config;
 
 import com.ht.miaosha.entity.MiaoshaUser;
+import com.ht.miaosha.exception.LoginException;
 import com.ht.miaosha.service.MiaoshaUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -40,11 +41,16 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
         //TODO 这里需要注意，现在没有办法直接跳转到登录页面
         if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
-            return "login";
+            throw new LoginException();
         }
         String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-        return userService.getByToken(response, token);
+        MiaoshaUser user = userService.getByToken(response, token);
 
+        if(user == null) {
+            throw new LoginException();
+        }
+
+        return user;
     }
 
     private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
