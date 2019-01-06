@@ -34,6 +34,7 @@ public class MiaoshaController {
     public String list(Model model, MiaoshaUser user, @RequestParam("goodsId")long goodsId) {
         model.addAttribute("user", user);
 
+//        判断库存                 这里容易出现并发的问题
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
 
         int stock = goods.getStockCount();
@@ -43,7 +44,7 @@ public class MiaoshaController {
             return "miaosha_fail";
         }
 
-//        判断是否秒杀到了
+//        判断是否秒杀到了              这里也可能出现并发的问题
         MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
 
         if(miaoshaOrder != null) {

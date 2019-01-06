@@ -27,6 +27,13 @@ public class GoodsController {
     @Autowired
     GoodsService goodsService;
 
+    /**
+     * QPS 167 未优化
+     * 1000 * 10
+     * @param model
+     * @param user
+     * @return
+     */
     @GetMapping("/to_list")
     public String toList(Model model, MiaoshaUser user) {
         log.info(user.toString());
