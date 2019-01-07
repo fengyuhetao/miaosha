@@ -3,8 +3,10 @@ package com.ht.miaosha.controller;
 import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.redis.GoodsKey;
 import com.ht.miaosha.redis.RedisService;
+import com.ht.miaosha.result.Result;
 import com.ht.miaosha.service.GoodsService;
 import com.ht.miaosha.service.MiaoshaUserService;
+import com.ht.miaosha.vo.GoodsDetailVo;
 import com.ht.miaosha.vo.GoodsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,16 @@ public class GoodsController {
     ThymeleafViewResolver thymeleafViewResolver;
 
     /**
-     * QPS 167 未优化
+     * 未优化
+     * QPS 167
+     * 1000 * 10
+     * <p>
+     * 该功能在真实环境中往往会采用分页的形式展示
+     * 往往只会缓存前几页
+     * 针对该功能的缓存时间往往比较短
+     * </p>
+     * 添加页面缓存
+     * QPS 743
      * 1000 * 10
      * @param model
      * @param user
@@ -78,6 +89,12 @@ public class GoodsController {
 
     /**
      * 别忘了设置编码UTF-8，不然会出问题。。
+     * QPS 295
+     * 1000 * 10
+     *
+     * 添加缓存后
+     * QPS 813
+     * 1000 * 10
      * @param request
      * @param response
      * @param model
@@ -93,7 +110,6 @@ public class GoodsController {
         //        取缓存
         String html = redisService.get(GoodsKey.getGoodsDetail, String.valueOf(goodsId), String.class);
         if(!StringUtils.isEmpty(html)) {
-            System.out.println(html);
             return html;
         }
 
@@ -136,8 +152,46 @@ public class GoodsController {
             redisService.set(GoodsKey.getGoodsDetail, String.valueOf(goodsId), html);
         }
 
-        System.out.println(html);
-
         return html;
+    }
+
+    /**
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @GetMapping(value = "/api/to_detail/{goodsId}")
+    @ResponseBody
+    public Result<GoodsDetailVo> toDetailApi(MiaoshaUser user, @PathVariable("goodsId")long goodsId) {
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+
+        long startAt = goods.getStartDate().getTime();
+        long endAt = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        int miaoshaStatus = 0;
+
+        int remainSeconds = 0;
+
+        // 秒杀尚未开始
+        if(now < startAt) {
+            miaoshaStatus = 0;
+            remainSeconds = (int)(startAt - now) / 1000;
+        } else if(now > endAt) {
+//            秒杀已经结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        } else {
+//            秒杀进行中
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+
+        GoodsDetailVo goodsDetailVo = new GoodsDetailVo();
+        goodsDetailVo.setUser(user);
+        goodsDetailVo.setMiaoshaStatus(miaoshaStatus);
+        goodsDetailVo.setRemainSeconds(remainSeconds);
+        goodsDetailVo.setGoods(goods);
+        return Result.success(goodsDetailVo);
     }
 }
