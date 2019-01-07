@@ -6,6 +6,8 @@ import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.entity.OrderInfo;
 import com.ht.miaosha.enumerate.OrderChannel;
 import com.ht.miaosha.enumerate.OrderStatus;
+import com.ht.miaosha.redis.OrderKey;
+import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.service.OrderService;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderDao orderDao;
 
+    @Autowired
+    RedisService redisService;
+
     @Override
     public MiaoshaOrder getMiaoshaOrderByUserIdAndGoodsId(long userId, long goodsId) {
-        return orderDao.getMiaoshaOrderByUserIdAndGoodsId(userId, goodsId);
+        return redisService.get(OrderKey.getMiaoshaOrderByUidGid, "" + userId + "_" + goodsId, MiaoshaOrder.class);
+//        return orderDao.getMiaoshaOrderByUserIdAndGoodsId(userId, goodsId);
     }
 
     @Transactional
@@ -50,6 +56,12 @@ public class OrderServiceImpl implements OrderService {
         orderDao.insertMiaoshaOrder(miaoshaOrder);
 
         orderInfo.setId(orderId);
+        redisService.set(OrderKey.getMiaoshaOrderByUidGid, ""+user.getId() + "_" + goodsVo.getId(), miaoshaOrder);
         return orderInfo;
+    }
+
+    @Override
+    public OrderInfo getMiaoshaOrderById(long orderId) {
+        return orderDao.getMiaoshaOrderById(orderId);
     }
 }

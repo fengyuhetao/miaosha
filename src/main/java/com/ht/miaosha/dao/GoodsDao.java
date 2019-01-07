@@ -28,6 +28,6 @@ public interface GoodsDao {
             "left join " + sub_tableName + " t2 on t1.goods_id = #{goodsId} and t1.goods_id = t2.id ")
     GoodsVo getGoodsVoByGoodsId(@Param("goodsId") long goodsId);
 
-    @Update("update " + main_tableName + " set stock_count = stock_count - 1 where goods_id = #{goodsId}")
+    @Update("update " + main_tableName + " set stock_count = stock_count - 1 where goods_id = #{goodsId} and stock_count > 0")
     void reduceStock(MiaoshaGoods good);
 }

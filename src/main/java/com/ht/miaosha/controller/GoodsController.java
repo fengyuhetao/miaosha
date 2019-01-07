@@ -162,7 +162,8 @@ public class GoodsController {
      */
     @GetMapping(value = "/api/to_detail/{goodsId}")
     @ResponseBody
-    public Result<GoodsDetailVo> toDetailApi(MiaoshaUser user, @PathVariable("goodsId")long goodsId) {
+    public Result<GoodsDetailVo> toDetailApi(HttpServletRequest request, MiaoshaUser user, @PathVariable("goodsId")long goodsId) {
+        System.out.println(request.getRequestURI());
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
 
         long startAt = goods.getStartDate().getTime();
