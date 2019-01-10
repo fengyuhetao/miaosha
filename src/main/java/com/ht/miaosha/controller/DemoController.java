@@ -1,6 +1,8 @@
 package com.ht.miaosha.controller;
 
 import com.ht.miaosha.entity.User;
+import com.ht.miaosha.rabbitmq.MQReceiver;
+import com.ht.miaosha.rabbitmq.MQSender;
 import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.redis.UserKey;
 import com.ht.miaosha.service.UserService;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ht.miaosha.result.CodeMsg;
@@ -28,6 +31,12 @@ public class DemoController {
 	@Autowired
 	public RedisService redisServie;
 
+	@Autowired
+	public MQSender mqSender;
+
+	@Autowired
+	public MQReceiver mqReceiver;
+
 	@RequestMapping("/")
 	@ResponseBody
 	String home() {
@@ -39,6 +48,28 @@ public class DemoController {
 	@ResponseBody
 	public Result<String> hello() {
 		return Result.success("hello,sdimooc");
+	}
+
+	@RequestMapping("/mq")
+	@ResponseBody
+	public Result mq() {
+		mqSender.send("hello rabbitmq");
+		mqSender.sendTopic("hello rabbitmq");
+		return Result.success("success");
+	}
+
+	@RequestMapping("/mq/topic")
+	@ResponseBody
+	public Result mq_topic() {
+		mqSender.sendTopic("hello rabbitmq");
+		return Result.success("success");
+	}
+
+	@RequestMapping("/mq/fanout")
+	@ResponseBody
+	public Result mq_fanout() {
+		mqSender.sendFanout("hello rabbitmq");
+		return Result.success("success");
 	}
 
 	@RequestMapping("/helloError")
