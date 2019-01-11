@@ -9,6 +9,8 @@ import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.service.GoodsService;
 import com.ht.miaosha.service.MiaoshaService;
 import com.ht.miaosha.service.OrderService;
+import com.ht.miaosha.util.MD5Util;
+import com.ht.miaosha.util.UUIDUtil;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,19 @@ public class MiaoshaServiceImpl implements MiaoshaService {
                 return 0;
             }
         }
+    }
+
+    @Override
+    public boolean checkPath(MiaoshaUser user, long goodsId, String path) {
+        String pathOld = redisService.get(MiaoshaKey.getMiaoshaPath, "" + user.getId() + "_" + goodsId, String.class);
+        return path.equals(pathOld);
+    }
+
+    @Override
+    public String createMiaoshaPath(MiaoshaUser user, long goodsId) {
+        String str = MD5Util.md5(UUIDUtil.uuid() + "123456");
+        redisService.set(MiaoshaKey.getMiaoshaPath, ""+ user.getId() + "_" + goodsId, str);
+        return str;
     }
 
     private void setGoodsOver(Long goodsId) {

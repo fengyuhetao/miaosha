@@ -6,12 +6,15 @@ import com.ht.miaosha.entity.OrderInfo;
 import com.ht.miaosha.rabbitmq.MQSender;
 import com.ht.miaosha.rabbitmq.MiaoshaMessage;
 import com.ht.miaosha.redis.GoodsKey;
+import com.ht.miaosha.redis.MiaoshaKey;
 import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.result.CodeMsg;
 import com.ht.miaosha.result.Result;
 import com.ht.miaosha.service.GoodsService;
 import com.ht.miaosha.service.MiaoshaService;
 import com.ht.miaosha.service.OrderService;
+import com.ht.miaosha.util.MD5Util;
+import com.ht.miaosha.util.UUIDUtil;
 import com.ht.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hetao on 2019/1/5.
@@ -42,6 +47,8 @@ public class MiaoshaController implements InitializingBean {
     @Autowired
     MQSender mqSender;
 
+    private Map<Long, Boolean> localOverMap = new HashMap<>();
+
     /**
      * 系统初始化
      *
@@ -56,6 +63,7 @@ public class MiaoshaController implements InitializingBean {
 
         for (GoodsVo goodsVo : goodsVoList) {
             redisService.set(GoodsKey.getMiaoshaGoodsStock, "" + goodsVo.getId(), goodsVo.getGoodsStock());
+            localOverMap.put(goodsVo.getId(), false);
         }
     }
 
@@ -90,7 +98,8 @@ public class MiaoshaController implements InitializingBean {
 
     /**
      * 前后端分离版本
-     *
+     * QPS: 1306
+     * 5000 * 10
      * @param user
      * @param goodsId
      * @return
@@ -128,15 +137,33 @@ public class MiaoshaController implements InitializingBean {
      * 前后端分离
      * 使用rabbit改进
      *
+     * QPS: 2114
+     * 5000 * 10
      * @param user
      * @param goodsId
      * @return
      */
-    @PostMapping("/api/rabbit/do_miaosha")
+    @PostMapping("/api/{path}/rabbit/do_miaosha")
     @ResponseBody
-    public Result<Integer> doApiRabbitMiaosha(MiaoshaUser user, @RequestParam("goodsId") long goodsId) {
-        if (user == null) {
-            return Result.error(CodeMsg.MOBILE_NOT_EXIST);
+    public Result<Integer> doApiRabbitMiaosha(MiaoshaUser user, @RequestParam("goodsId") long goodsId, @PathVariable("path") String path) {
+//TODO        存在问题，如果rabbit出现问题或者延迟过高，第一个用户连续点击13次秒杀，redis中库存就变为负值
+//        内存标记，减少redis查询量
+        boolean over = localOverMap.get(goodsId);
+        if(over) {
+            return Result.error(CodeMsg.MIAOSHA_OVER);
+        }
+
+//        验证path
+        boolean check = miaoshaService.checkPath(user, goodsId, path);
+        if(!check) {
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        }
+
+//        redis中预减库存
+        long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
+        if (stock < 0) {
+            localOverMap.put(goodsId, true);
+            return Result.error(CodeMsg.MIAOSHA_OVER);
         }
 
 //        判断是否秒杀到了
@@ -146,11 +173,7 @@ public class MiaoshaController implements InitializingBean {
             return Result.error(CodeMsg.REPEAT_MIAOSHA);
         }
 
-        //        redis中预减库存
-        long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
-        if (stock < 0) {
-            return Result.error(CodeMsg.MIAOSHA_OVER);
-        }
+
 
         //        入队
         MiaoshaMessage miaoshaMessage = new MiaoshaMessage();
@@ -178,5 +201,13 @@ public class MiaoshaController implements InitializingBean {
 
         long result = miaoshaService.getMiaoshaResult(user.getId(), goodsId);
         return Result.success(result);
+    }
+
+    @GetMapping("/api/path")
+    @ResponseBody
+    public Result<String> getMiaoshaPath(MiaoshaUser user, @RequestParam("goodsId") long goodsId) {
+        String path = miaoshaService.createMiaoshaPath(user, goodsId);
+
+        return Result.success(path);
     }
 }
