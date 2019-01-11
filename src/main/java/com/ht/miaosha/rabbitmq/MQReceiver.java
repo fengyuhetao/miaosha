@@ -41,4 +41,9 @@ public class MQReceiver {
     public void receiveFanout2(String message) {
         log.info("receive Message fanout2:" + message);
     }
+
+    @RabbitListener(queues = MQConfig.HEADERS_QUEUE)
+    public void receiveHeader(byte[] message) {
+        log.info("receive Message header:" + new String(message));
+    }
 }

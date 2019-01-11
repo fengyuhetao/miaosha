@@ -4,6 +4,9 @@ import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Created by hetao on 2019/1/10.
@@ -19,6 +22,8 @@ public class MQConfig {
     public static final String FANOUT_EXCHANGE = "fanout_exchange";
     public static final String FANOUT_QUEUE1 = "fanout_queue1";
     public static final String FANOUT_QUEUE2 = "fanout_queue2";
+    public static final String HEADERS_EXCHANGE = "headers_exchange";
+    public static final String HEADERS_QUEUE = "headers_queue";
 
     /**
      * Direct 模式 交换机Exchange
@@ -53,6 +58,11 @@ public class MQConfig {
     }
 
     @Bean
+    public Queue headerQueue() {
+        return new Queue(HEADERS_QUEUE, true);
+    }
+
+    @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(TOPIC_EXCHANGE);
     }
@@ -68,7 +78,7 @@ public class MQConfig {
     }
 
     /**
-     * Fanout模式  交换机Exchange
+     * Fanout模式  交换机Exchange           广播模式
      */
     @Bean
     public FanoutExchange fanoutExchange() {
@@ -83,5 +93,21 @@ public class MQConfig {
     @Bean
     public Binding fanoutBinding2() {
         return BindingBuilder.bind(fanoutQueue2()).to(fanoutExchange());
+    }
+
+    /**
+     * Headers模式  交换机Exchange
+     */
+    @Bean
+    public HeadersExchange headersExchange() {
+        return new HeadersExchange(HEADERS_EXCHANGE);
+    }
+
+    @Bean
+    public Binding headerBinding() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("header1", "value1");
+        map.put("header2", "value2");
+        return BindingBuilder.bind(headerQueue()).to(headersExchange()).whereAll(map).match();
     }
 }

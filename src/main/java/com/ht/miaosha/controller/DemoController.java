@@ -72,6 +72,13 @@ public class DemoController {
 		return Result.success("success");
 	}
 
+	@RequestMapping("/mq/header")
+	@ResponseBody
+	public Result mq_header() {
+		mqSender.sendHeader("hello header");
+		return Result.success("success");
+	}
+
 	@RequestMapping("/helloError")
 	@ResponseBody
 	public Result<String> helloError() {
