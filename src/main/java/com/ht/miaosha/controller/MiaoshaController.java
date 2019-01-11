@@ -1,10 +1,12 @@
 package com.ht.miaosha.controller;
 
+import com.ht.miaosha.access.AccessLimit;
 import com.ht.miaosha.entity.MiaoshaOrder;
 import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.entity.OrderInfo;
 import com.ht.miaosha.rabbitmq.MQSender;
 import com.ht.miaosha.rabbitmq.MiaoshaMessage;
+import com.ht.miaosha.redis.AccessKey;
 import com.ht.miaosha.redis.GoodsKey;
 import com.ht.miaosha.redis.MiaoshaKey;
 import com.ht.miaosha.redis.RedisService;
@@ -23,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -207,14 +210,16 @@ public class MiaoshaController implements InitializingBean {
         return Result.success(result);
     }
 
+    @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
     @GetMapping("/api/path")
     @ResponseBody
-    public Result<String> getMiaoshaPath(MiaoshaUser user,
+    public Result<String> getMiaoshaPath(HttpServletRequest request, MiaoshaUser user,
                                          @RequestParam("goodsId") long goodsId,
-                                         @RequestParam("verifyCode") int verifyCode) {
+                                         @RequestParam(value = "verifyCode", defaultValue = "0") int verifyCode) {
         if(goodsId <= 0) {
             return null;
         }
+
         boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
         if(!check) {
             return Result.error(CodeMsg.REQUEST_ILLEGAL);

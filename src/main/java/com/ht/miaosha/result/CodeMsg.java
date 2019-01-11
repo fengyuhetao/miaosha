@@ -27,6 +27,7 @@ public class CodeMsg {
 	public static CodeMsg REPEAT_MIAOSHA = new CodeMsg(500501, "重复秒杀");
 	public static CodeMsg REQUEST_ILLEGAL = new CodeMsg(500502, "请求不合法");
 	public static CodeMsg MIAOSHA_FAIL = new CodeMsg(500503, "秒杀失败");
+	public static CodeMsg ACCESS_LIMIT = new CodeMsg(500503, "访问太过频繁");
 
 	private CodeMsg(int code, String msg) {
 		this.code = code;
@@ -45,5 +46,4 @@ public class CodeMsg {
 	public String getMsg() {
 		return msg;
 	}
-
 }

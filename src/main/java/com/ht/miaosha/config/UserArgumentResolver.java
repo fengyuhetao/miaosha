@@ -1,5 +1,6 @@
 package com.ht.miaosha.config;
 
+import com.ht.miaosha.access.UserContext;
 import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.exception.LoginException;
 import com.ht.miaosha.service.MiaoshaUserService;
@@ -22,9 +23,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
-    @Autowired
-    MiaoshaUserService userService;
-
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
         Class<?> clazz = methodParameter.getParameterType();
@@ -34,38 +32,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     @Nullable
     @Override
     public Object resolveArgument(MethodParameter methodParameter, @Nullable ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        String paramToken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
-        String cookieToken = getCookieValue(request, MiaoshaUserService.COOKIE_NAME_TOKEN);
 
-        //TODO 这里需要注意，现在没有办法直接跳转到登录页面
-        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
-            throw new LoginException();
-        }
-        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-        MiaoshaUser user = userService.getByToken(response, token);
-
-        if(user == null) {
-            throw new LoginException();
-        }
-
-        return user;
-    }
-
-    private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
-        Cookie[] cookies = request.getCookies();
-
-        if(cookies == null || cookies.length == 0) {
-            return null;
-        }
-
-        for (Cookie cookie: cookies) {
-            if(cookie.getName().equals(cookieNameToken)) {
-                return cookie.getValue();
-            }
-        }
-
-        return null;
+        return UserContext.getUser();
     }
 }

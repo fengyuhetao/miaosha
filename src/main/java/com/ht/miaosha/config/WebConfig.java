@@ -1,8 +1,10 @@
 package com.ht.miaosha.config;
 
+import com.ht.miaosha.access.AccessInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -17,6 +19,9 @@ public class WebConfig extends WebMvcConfigurationSupport{
     @Autowired
     UserArgumentResolver argumentResolver;
 
+    @Autowired
+    AccessInterceptor accessInterceptor;
+
     /**
      * 添加静态资源映射
      * @param registry
@@ -30,5 +35,10 @@ public class WebConfig extends WebMvcConfigurationSupport{
     @Override
     protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(argumentResolver);
+    }
+
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(accessInterceptor);
     }
 }
