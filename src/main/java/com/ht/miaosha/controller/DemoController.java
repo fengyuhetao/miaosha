@@ -50,35 +50,6 @@ public class DemoController {
 		return Result.success("hello,sdimooc");
 	}
 
-	@RequestMapping("/mq")
-	@ResponseBody
-	public Result mq() {
-		mqSender.send("hello rabbitmq");
-		mqSender.sendTopic("hello rabbitmq");
-		return Result.success("success");
-	}
-
-	@RequestMapping("/mq/topic")
-	@ResponseBody
-	public Result mq_topic() {
-		mqSender.sendTopic("hello rabbitmq");
-		return Result.success("success");
-	}
-
-	@RequestMapping("/mq/fanout")
-	@ResponseBody
-	public Result mq_fanout() {
-		mqSender.sendFanout("hello rabbitmq");
-		return Result.success("success");
-	}
-
-	@RequestMapping("/mq/header")
-	@ResponseBody
-	public Result mq_header() {
-		mqSender.sendHeader("hello header");
-		return Result.success("success");
-	}
-
 	@RequestMapping("/helloError")
 	@ResponseBody
 	public Result<String> helloError() {

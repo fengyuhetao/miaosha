@@ -9,4 +9,6 @@ import com.ht.miaosha.vo.GoodsVo;
  */
 public interface MiaoshaService {
     OrderInfo miaosha(MiaoshaUser user, GoodsVo goodsVo);
+
+    long getMiaoshaResult(long userId, long goodsId);
 }

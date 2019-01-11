@@ -1,10 +1,11 @@
 package com.ht.miaosha.service.impl;
 
-import com.ht.miaosha.dao.GoodsDao;
 import com.ht.miaosha.dao.OrderDao;
-import com.ht.miaosha.entity.Goods;
+import com.ht.miaosha.entity.MiaoshaOrder;
 import com.ht.miaosha.entity.MiaoshaUser;
 import com.ht.miaosha.entity.OrderInfo;
+import com.ht.miaosha.redis.MiaoshaKey;
+import com.ht.miaosha.redis.RedisService;
 import com.ht.miaosha.service.GoodsService;
 import com.ht.miaosha.service.MiaoshaService;
 import com.ht.miaosha.service.OrderService;
@@ -33,14 +34,44 @@ public class MiaoshaServiceImpl implements MiaoshaService {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    RedisService redisService;
+
     @Transactional
     @Override
     public OrderInfo miaosha(MiaoshaUser user, GoodsVo goodsVo) {
 
-        goodsService.reduceStock(goodsVo);
+        boolean isSuccess = goodsService.reduceStock(goodsVo);
+
+        if(!isSuccess) {
+            setGoodsOver(goodsVo.getId());
+            return null;
+        }
 
 //        order_info miaosha_order
-        OrderInfo orderInfo = orderService.createOrder(user, goodsVo);
-        return orderInfo;
+        return orderService.createOrder(user, goodsVo);
+    }
+
+    @Override
+    public long getMiaoshaResult(long userId, long goodsId) {
+        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(userId, goodsId);
+        if(order != null) {         // 秒杀成功
+            return order.getOrderId();
+        } else {
+            boolean isOver = getGoodsOver(goodsId);
+            if(isOver) {             // 秒杀结束
+                return -1;
+            } else {                 // 排队中
+                return 0;
+            }
+        }
+    }
+
+    private void setGoodsOver(Long goodsId) {
+        redisService.set(MiaoshaKey.isGoodsOver, ""+goodsId, true);
+    }
+
+    private boolean getGoodsOver(Long goodsId) {
+        return redisService.exists(MiaoshaKey.isGoodsOver, ""+goodsId);
     }
 }

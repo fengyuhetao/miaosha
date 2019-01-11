@@ -30,11 +30,12 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public void reduceStock(GoodsVo good) {
+    public boolean reduceStock(GoodsVo good) {
         //        减少库存
         MiaoshaGoods g = new MiaoshaGoods();
         g.setGoodsId(good.getId());
         g.setStockCount(good.getGoodsStock() - 1);
-        goodsDao.reduceStock(g);
+        int ret = goodsDao.reduceStock(g);
+        return ret > 0;
     }
 }

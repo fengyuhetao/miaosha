@@ -48,14 +48,13 @@ public class OrderServiceImpl implements OrderService {
         orderInfo.setStatus(OrderStatus.NEW_WITHOUT_PAY.getCode());
         orderInfo.setUserId(user.getId());
 
-        long orderId = orderDao.insert(orderInfo);
+        orderDao.insert(orderInfo);
         MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
         miaoshaOrder.setGoodsId(goodsVo.getId());
-        miaoshaOrder.setOrderId(orderId);
+        miaoshaOrder.setOrderId(orderInfo.getId());
         miaoshaOrder.setUserId(user.getId());
         orderDao.insertMiaoshaOrder(miaoshaOrder);
 
-        orderInfo.setId(orderId);
         redisService.set(OrderKey.getMiaoshaOrderByUidGid, ""+user.getId() + "_" + goodsVo.getId(), miaoshaOrder);
         return orderInfo;
     }
