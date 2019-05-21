@@ -179,9 +179,7 @@ public class MiaoshaController implements InitializingBean {
         if (miaoshaOrder != null) {
             return Result.error(CodeMsg.REPEAT_MIAOSHA);
         }
-
-
-
+        
         //        入队
         MiaoshaMessage miaoshaMessage = new MiaoshaMessage();
         miaoshaMessage.setUser(user);

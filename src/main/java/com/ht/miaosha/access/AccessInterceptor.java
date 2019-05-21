@@ -88,7 +88,7 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
 
         //TODO 这里需要注意，现在没有办法直接跳转到登录页面
         if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
-            throw new LoginException();
+//            throw new LoginException();
         }
         String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
         MiaoshaUser user = userService.getByToken(response, token);
